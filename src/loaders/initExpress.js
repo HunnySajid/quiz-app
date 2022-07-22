@@ -2,7 +2,9 @@ import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
 import { globalErrorHandler } from '../api/controllers/errorController.js';
+import { config } from '../config/index.js';
 import { AppError } from '../utils/AppError.js';
+import userRoutes from '../api/routes/userRouter.js';
 
 export const initExpress = ({ app }) => {
 	app.use(helmet());
@@ -11,7 +13,7 @@ export const initExpress = ({ app }) => {
 	app.enable('trust proxy');
 	// Enable Cross Origin Resource Sharing to all origins by default
 	if (process.env.NODE_ENV === 'production') {
-		app.use(cors({ origin: 'https://quizco-app.netlify.app' }));
+		app.use(cors({ origin: process.env.BASE_URL }));
 	} else {
 		app.use(cors());
 	}
@@ -21,6 +23,7 @@ export const initExpress = ({ app }) => {
 	app.use(express.urlencoded({ extended: true }));
 
 	app.get('/', (req, res) => res.send('API is running'));
+	app.use(`${config.api.prefix}/users`, userRoutes);
 
 	// all runs for all http methods
 	app.all('*', (req, res, next) => {
