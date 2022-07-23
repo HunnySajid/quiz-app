@@ -5,6 +5,7 @@ import { globalErrorHandler } from '../api/controllers/errorController.js';
 import { config } from '../config/index.js';
 import { AppError } from '../utils/AppError.js';
 import userRoutes from '../api/routes/userRouter.js';
+import quizRoutes from '../api/routes/quizRouter.js';
 
 export const initExpress = ({ app }) => {
 	app.use(helmet());
@@ -24,6 +25,7 @@ export const initExpress = ({ app }) => {
 
 	app.get('/', (req, res) => res.send('API is running'));
 	app.use(`${config.api.prefix}/users`, userRoutes);
+	app.use(`${config.api.prefix}/quizzes`, quizRoutes);
 
 	// all runs for all http methods
 	app.all('*', (req, res, next) => {
