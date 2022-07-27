@@ -8,6 +8,7 @@ import {
   IconButton,
   Tooltip,
 } from '@material-ui/core';
+import { FiLogOut } from "react-icons/fi";
 import { useUser } from '../contexts/UserContext';
 
 export const AccountMenu = () => {
@@ -59,7 +60,7 @@ export const AccountMenu = () => {
             }, 1000);
           }}
         >
-          Logout
+          <FiLogOut size={16} /> Logout
         </MenuItem>
       </Menu>
     </React.Fragment>

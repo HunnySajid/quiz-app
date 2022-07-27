@@ -1,15 +1,12 @@
-import { Button, IconButton } from "@material-ui/core";
+import { Button } from "@material-ui/core";
 import * as React from "react";
 import { useState } from "react";
-import { FcClearFilters } from "react-icons/fc";
-import { RiFilterFill } from "react-icons/ri";
 import { EmptyResponse } from "../components/EmptyResponse";
 import { ErrorMessage } from "../components/ErrorMessage";
 import { FiltersForm } from "../components/forms/FiltersForm";
 import { ModalSkeleton } from "../components/Modal";
 import { QuizCard } from "../components/QuizCard";
 import { Loader } from "../components/Svgs";
-import { globalColors } from "../shared/constants";
 import { IQuiz } from "../shared/interfaces";
 import { useQuizes } from "../shared/queries";
 import { endpoints } from "../shared/urls";
@@ -55,16 +52,6 @@ export const Quizes = () => {
     <div className="pb-10">
       <div className="flex justify-center">
         <h3 className="text-2xl font-semibold text-center my-3">All Quizzes</h3>
-        <div className="flex items-center justify-center ml-3">
-          <IconButton onClick={handleFiltersOpen} aria-label="Filters">
-            <RiFilterFill fill={globalColors.brand} size={25} />
-          </IconButton>
-          {(searchTerm || tag) && (
-            <IconButton onClick={clearFilters} aria-label="Filters">
-              <FcClearFilters size={25} fill={globalColors.red} />
-            </IconButton>
-          )}
-        </div>
       </div>
 
       {isLoading || isFetching ? (

@@ -48,13 +48,13 @@ export const AddEditQuizFormFields = ({ id }: { id?: string }) => {
           allowDuplicates={false}
           error={!!(touched.tags && errors.tags)}
           helperText={touched.tags && errors.tags}
-          alwaysShowPlaceholder={!!values.tags.length}
+          alwaysShowPlaceholder={!!values.tags?.length}
           value={values.tags}
           onAdd={(chip) => {
-            setFieldValue("tags", values.tags.concat(chip));
+            setFieldValue("tags", values.tags?.concat(chip) ?? [chip]);
           }}
           onDelete={(chip, indexChip) => {
-            const tags = values.tags.filter((_, i) => i !== indexChip);
+            const tags = values.tags?.filter((_, i) => i !== indexChip);
             setFieldValue("tags", tags);
           }}
         />

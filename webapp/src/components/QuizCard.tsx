@@ -80,7 +80,7 @@ export const QuizCard: React.FC<Props> = (props) => {
           </p>
         )}
         <div className="flex mt-4">
-          {tags.map((tag, i) => (
+          {tags?.map((tag, i) => (
             <p
               key={i}
               style={{

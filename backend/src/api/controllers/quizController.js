@@ -45,16 +45,11 @@ const createQuiz = asyncHandler(async (req, res) => {
 const updateQuiz = asyncHandler(async (req, res) => {
 	const { title, description, tags } = req.body;
 	const { quizId } = req.params;
-	const toUpdateData = {};
 
 	if (tags) {
 		if (!Array.isArray(tags)) {
 			throw new AppError('Please send tags as array.', 400);
 		}
-		if (!(tags.length >= 1)) {
-			throw new AppError('Please send at least 1 tag.', 400);
-		}
-		toUpdateData.tags = tags;
 	}
 	const quiz = await Quiz.findById(quizId);
 
@@ -66,8 +61,12 @@ const updateQuiz = asyncHandler(async (req, res) => {
 		quiz.description = description;
 	}
 
-	if (toUpdateData.tags) {
-		quiz.tags = toUpdateData.tags;
+	if (tags) {
+		if (!(tags.length >= 1)) {
+			quiz.tags = null;
+		} else {
+			quiz.tags = tags;
+		}
 	}
 
 	if (quiz.status === 'active') {
