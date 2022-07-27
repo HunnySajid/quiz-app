@@ -60,7 +60,7 @@ const createQuestion = asyncHandler(async (req, res) => {
 const getAllQuestion = asyncHandler(async (req, res) => {
 	const { quizId } = req.params;
 	const quiz = await Quiz.findById(quizId);
-	const questions = await Question.find({ quiz: quizId });
+	const questions = await Question.find({ quiz: quizId }).select('-options.correct');
 
 	if (!quiz) {
 		res.status(404);
@@ -78,6 +78,7 @@ const getAllQuestion = asyncHandler(async (req, res) => {
 	return res.status(200).json({
 		status: 'success',
 		questions,
+		quizTitle: quiz.title,
 		author: quiz.author
 	});
 });

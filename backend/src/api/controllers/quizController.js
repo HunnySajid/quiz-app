@@ -1,3 +1,4 @@
+import { response } from 'express';
 import asyncHandler from 'express-async-handler';
 import { Quiz } from '../../models/Quiz.js';
 
@@ -88,10 +89,37 @@ const updateQuiz = asyncHandler(async (req, res) => {
 });
 
 // @desc Publish a Quiz
-// @route PATCH /quizzes/:quizId
+// @route PATCH /quizzes/:quizId/publish
 // @access PRIVATE
 const publishQuiz = asyncHandler(async (req, res, next) => {
-	// TODO
+	const { quizId } = req.params;
+
+	const quiz = await Quiz.findById(quizId);
+
+	if (!quiz) {
+		res.status(404);
+		throw new Error('Quiz does not exist');
+	}
+
+	if (quiz.status === 'active') {
+		res.status(401);
+		throw new Error('Quiz is already published');
+	}
+
+	if (quiz.deleted) {
+		res.status(403);
+		throw new Error('Quiz is inactivated');
+	}
+	quiz.status = 'active';
+	// TODO: need an advance way to assign permalink, need to check if it is not already associated with some published quiz
+	quiz.permalink = Math.random().toString(36).substr(2, 6);
+
+	const updatedQuiz = await quiz.save({ new: true, runValidators: true });
+
+	return res.status(200).json({
+		status: 'success',
+		quiz: updatedQuiz
+	});
 });
 
 // @desc Fetch all Quizzes
@@ -131,6 +159,33 @@ const getQuiz = asyncHandler(async (req, res) => {
 	});
 });
 
+// @desc Fetch a Quiz to play
+// @route GET /quizzes/:permalink/play
+// @access PRIVATE
+const getQuizToPlay = asyncHandler(async (req, res) => {
+	const { permalink } = req.params;
+
+	const quiz = await Quiz.findOne({ permalink })
+		.populate({
+			path: 'questions',
+			select: '-options.correct'
+		})
+		.populate('questionsCount');
+
+	if (!quiz) {
+		res.status(404);
+		throw new Error('Quiz not found.');
+	}
+
+	return res.status(200).json({
+		status: 'success',
+		questions: quiz.questions,
+		quizTitle: quiz.title,
+		author: quiz.author,
+		quizId: quiz.id
+	});
+});
+
 const deleteQuiz = asyncHandler(async (req, res) => {
 	const { quizId } = req.params;
 	const quiz = await Quiz.findOneAndUpdate({ _id: quizId }, { deleted: true });
@@ -145,4 +200,60 @@ const deleteQuiz = asyncHandler(async (req, res) => {
 	});
 });
 
-export { createQuiz, updateQuiz, publishQuiz, getQuiz, deleteQuiz, getAllQuizzes };
+// @desc Post results of a quiz
+// @route POST /quizzes/:quizId/play/result
+// @access PUBLIC
+const getQuizResult = asyncHandler(async (req, res, next) => {
+	const { quizId } = req.params;
+	const { answers } = req.body;
+
+	const quiz = await Quiz.findById(quizId).populate('questions questionsCount');
+
+	if (!quiz) {
+		res.status(404);
+		throw new Error('Quiz does not exist');
+	}
+
+	if (quiz.status !== 'active') {
+		res.status(401);
+		throw new Error('Quiz is not published');
+	}
+
+	if (quiz.deleted) {
+		res.status(403);
+		throw new Error('Quiz is inactivated');
+	}
+
+	let correctCount = 0;
+	quiz.questions.forEach((question, index) => {
+		let answer = answers[index].response;
+		answer = answer.sort().join('');
+
+		const correctAnswer = question.options
+			.map((op, ind) => ind + 1)
+			.filter((op) => question.options[op - 1].correct)
+			.sort()
+			.join('');
+
+		if (answer === correctAnswer) {
+			correctCount++;
+		}
+	});
+
+	return res.status(200).json({
+		status: 'success',
+		total: quiz.questions.length,
+		correct: correctCount
+	});
+});
+
+export {
+	createQuiz,
+	getQuizToPlay,
+	updateQuiz,
+	publishQuiz,
+	getQuiz,
+	deleteQuiz,
+	getAllQuizzes,
+	getQuizResult
+};
