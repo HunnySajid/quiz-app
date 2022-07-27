@@ -1,6 +1,6 @@
-import { response } from 'express';
 import asyncHandler from 'express-async-handler';
 import { Quiz } from '../../models/Quiz.js';
+import { AppError } from '../../utils/AppError.js';
 
 // @desc Create a Quiz
 // @route POST /quizzes
@@ -11,23 +11,19 @@ const createQuiz = asyncHandler(async (req, res) => {
 	const author = req.user._id;
 
 	if (!title) {
-		res.status(400);
-		throw new Error('Please send Quiz title.');
+		throw new AppError('Please send Quiz title.', 400);
 	}
 
 	if (!author) {
-		res.status(400);
-		throw new Error('Author not found.');
+		throw new AppError('Author not found.', 400);
 	}
 
 	if (tags && !Array.isArray(tags)) {
-		res.status(400);
-		throw new Error('Please send tags as array.');
+		throw new AppError('Please send tags as array.', 400);
 	}
 
 	if (tags && !(tags.length >= 1)) {
-		res.status(400);
-		throw new Error('Please send at least 1 tag in array.');
+		throw new AppError('Please send at least 1 tag in array.', 400);
 	}
 
 	const quiz = await Quiz.create({
@@ -53,12 +49,10 @@ const updateQuiz = asyncHandler(async (req, res) => {
 
 	if (tags) {
 		if (!Array.isArray(tags)) {
-			res.status(400);
-			throw new Error('Please send tags as array.');
+			throw new AppError('Please send tags as array.', 400);
 		}
 		if (!(tags.length >= 1)) {
-			res.status(400);
-			throw new Error('Please send at least 1 tag.');
+			throw new AppError('Please send at least 1 tag.', 400);
 		}
 		toUpdateData.tags = tags;
 	}
@@ -77,8 +71,7 @@ const updateQuiz = asyncHandler(async (req, res) => {
 	}
 
 	if (quiz.status === 'active') {
-		res.status(401);
-		throw new Error('Can not edit a published Quiz');
+		throw new AppError('Can not edit a published Quiz', 401);
 	}
 	const updatedQuiz = await quiz.save({ new: true, runValidators: true });
 
@@ -97,18 +90,15 @@ const publishQuiz = asyncHandler(async (req, res, next) => {
 	const quiz = await Quiz.findById(quizId);
 
 	if (!quiz) {
-		res.status(404);
-		throw new Error('Quiz does not exist');
+		throw new AppError('Quiz does not exist', 404);
 	}
 
 	if (quiz.status === 'active') {
-		res.status(401);
-		throw new Error('Quiz is already published');
+		throw new AppError('Quiz is already published', 401);
 	}
 
 	if (quiz.deleted) {
-		res.status(403);
-		throw new Error('Quiz is inactivated');
+		throw new AppError('Quiz is inactivated', 403);
 	}
 	quiz.status = 'active';
 	// TODO: need an advance way to assign permalink, need to check if it is not already associated with some published quiz
@@ -149,8 +139,7 @@ const getQuiz = asyncHandler(async (req, res) => {
 		.populate('questionsCount');
 
 	if (!quiz) {
-		res.status(404);
-		throw new Error('Quiz not found');
+		throw new AppError('Quiz not found', 404);
 	}
 
 	return res.status(200).json({
@@ -173,8 +162,7 @@ const getQuizToPlay = asyncHandler(async (req, res) => {
 		.populate('questionsCount');
 
 	if (!quiz) {
-		res.status(404);
-		throw new Error('Quiz not found.');
+		throw new AppError('Quiz not found.', 404);
 	}
 
 	return res.status(200).json({
@@ -191,8 +179,7 @@ const deleteQuiz = asyncHandler(async (req, res) => {
 	const quiz = await Quiz.findOneAndUpdate({ _id: quizId }, { deleted: true });
 
 	if (!quiz) {
-		res.status(404);
-		throw new Error("Quiz you are trying to delete doesn't exist.");
+		throw new AppError("Quiz you are trying to delete doesn't exist.", 404);
 	}
 
 	return res.status(204).json({
@@ -210,18 +197,15 @@ const getQuizResult = asyncHandler(async (req, res, next) => {
 	const quiz = await Quiz.findById(quizId).populate('questions questionsCount');
 
 	if (!quiz) {
-		res.status(404);
-		throw new Error('Quiz does not exist');
+		throw new AppError('Quiz does not exist', 404);
 	}
 
 	if (quiz.status !== 'active') {
-		res.status(401);
-		throw new Error('Quiz is not published');
+		throw new AppError('Quiz is not published', 401);
 	}
 
 	if (quiz.deleted) {
-		res.status(403);
-		throw new Error('Quiz is inactivated');
+		throw new AppError('Quiz is inactivated', 403);
 	}
 
 	let correctCount = 0;

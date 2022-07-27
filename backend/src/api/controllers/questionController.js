@@ -2,6 +2,7 @@ import asyncHandler from 'express-async-handler';
 import { Question } from '../../models/Question.js';
 import { Quiz } from '../../models/Quiz.js';
 import { emptyResponseMessages, errorMessages } from '../../shared/constants.js';
+import { AppError } from '../../utils/AppError.js';
 
 // @desc Create a Question
 // @route POST /:quizId/questions/
@@ -11,34 +12,31 @@ const createQuestion = asyncHandler(async (req, res) => {
 	const { title, options } = req.body;
 
 	if (!title || !options) {
-		res.status(400);
-		throw new Error('Please send Quiz, title, options array');
+		throw new AppError('Please send Quiz, title, options array', 400);
 	}
 
 	options.forEach((option) => {
 		if (!option.text) {
-			throw new Error('Please send all option with a text key in it.');
+			throw new AppError('Please send all option with a text key in it.');
 		}
 	});
 
 	if (!(options.length >= 2 && options.length <= 5)) {
-		throw new Error('Options length should be between 2-5.');
+		throw new AppError('Options length should be between 2-5.');
 	}
 
 	if (!(options.filter((option) => option.correct).length >= 1)) {
-		throw new Error('Options must have atleast 1 correct option');
+		throw new AppError('Options must have atleast 1 correct option');
 	}
 
 	const quiz = await Quiz.findById(quizId).populate('questionsCount');
 
 	if (!quiz) {
-		res.status(404);
-		throw new Error("Cannot add questions to a quiz that doesn't exist");
+		throw new AppError("Cannot add questions to a quiz that doesn't exist", 404);
 	}
 
 	if (quiz.questionsCount > 9) {
-		res.status(409);
-		throw new Error('A Quiz cannot have more that 10 questions.');
+		throw new AppError('A Quiz cannot have more that 10 questions.', 409);
 	}
 
 	const question = await Question.create({
@@ -63,15 +61,13 @@ const getAllQuestion = asyncHandler(async (req, res) => {
 	const questions = await Question.find({ quiz: quizId }).select('-options.correct');
 
 	if (!quiz) {
-		res.status(404);
-		throw new Error('Quiz not found.');
+		throw new AppError('Quiz not found.', 404);
 	}
 
 	if (quiz.status !== 'active') {
 		const isLoggedInUserAuthor = req.user._id.equals(quiz.author);
 		if (!isLoggedInUserAuthor) {
-			res.status(403);
-			throw new Error('You do not have permission to access this quiz.');
+			throw new AppError('You do not have permission to access this quiz.', 403);
 		}
 	}
 
@@ -92,8 +88,7 @@ const getQuestion = asyncHandler(async (req, res) => {
 	const question = await Question.findOne({ _id: questionId, quiz: quizId });
 
 	if (!question) {
-		res.status(404);
-		throw new Error(emptyResponseMessages.NO_QUESTIONS_IN_QUIZ);
+		throw new AppError(emptyResponseMessages.NO_QUESTIONS_IN_QUIZ, 404);
 	}
 	return res.status(200).json({
 		status: 'success',
@@ -111,8 +106,7 @@ const updateQuestion = asyncHandler(async (req, res) => {
 	const questiontoUpdate = await Question.findOne({ _id: questionId, quiz: quizId });
 
 	if (!questiontoUpdate) {
-		res.status(404);
-		throw new Error(errorMessages.RESOURCE_DOES_NOT_EXIST('Question'));
+		throw new AppError(errorMessages.RESOURCE_DOES_NOT_EXIST('Question'), 404);
 	}
 
 	if (title) {
@@ -122,16 +116,16 @@ const updateQuestion = asyncHandler(async (req, res) => {
 	if (options) {
 		options.forEach((option) => {
 			if (!option.text) {
-				throw new Error('Please send all option with a text key in it.');
+				throw new AppError('Please send all option with a text key in it.');
 			}
 		});
 
 		if (!(options.length >= 2 && options.length <= 5)) {
-			throw new Error('Options length should be between 2-5.');
+			throw new AppError('Options length should be between 2-5.');
 		}
 
 		if (!(options.filter((option) => option.correct).length >= 1)) {
-			throw new Error('Options must have atleast 1 correct option');
+			throw new AppError('Options must have atleast 1 correct option');
 		}
 		questiontoUpdate.options = options;
 	}
@@ -153,8 +147,7 @@ const deleteQuestion = asyncHandler(async (req, res) => {
 	const question = await Question.findOneAndDelete({ _id: questionId, quiz: quizId });
 
 	if (!question) {
-		res.status(404);
-		throw new Error("Question you are trying to delete doesn't exist.");
+		throw new AppError("Question you are trying to delete doesn't exist.", 404);
 	}
 
 	return res.status(204).json({

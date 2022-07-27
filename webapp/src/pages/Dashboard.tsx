@@ -1,3 +1,4 @@
+import axios from "axios";
 import { Button } from '@material-ui/core';
 import { useSnackbar } from 'notistack';
 import { useEffect, useState } from 'react';
@@ -12,6 +13,7 @@ import { errorMessages, successMessages } from '../shared/constants';
 import { IQuiz } from '../shared/interfaces';
 import { useDeleteQuiz, useQuizes, usePublishQuiz } from '../shared/queries';
 import { endpoints } from '../shared/urls';
+import { GetErrorResponse } from '../shared/utils';
 
 interface Props {}
 
@@ -76,8 +78,15 @@ export const Dashboard: React.FC<Props> = () => {
           queryClient.invalidateQueries(['Quizzes', 'Current User']);
           setSelectedQuiz(null);
         },
-        onError: () => {
-          enqueueSnackbar(errorMessages.default, { variant: 'error' });
+        onError: (e) => {
+          if (axios.isAxiosError(e)) {
+            const data = GetErrorResponse(e)
+            enqueueSnackbar(data.message, {
+              variant: "error",
+            });
+          } else {
+            enqueueSnackbar(errorMessages.default, { variant: "error" });
+          }
         },
         onSettled: () => {
           resetPublishQuiz();

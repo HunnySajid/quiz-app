@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { SignedIn, SignedOut } from "./controlComponents";
+import { AccountMenu } from './AccountMenu';
 import Logo from "../assets/logos/White-Purple-Circle.png";
 
 interface Props {}
@@ -39,7 +40,7 @@ export const NavBar: React.FC<Props> = () => {
               Dashboard
             </p>
           </Link>
-          {/* <UserButton afterSignOutAllUrl="/" afterSignOutOneUrl="/" /> */}
+          <AccountMenu />
         </SignedIn>
       </div>
     </div>

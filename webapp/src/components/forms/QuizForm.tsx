@@ -1,11 +1,12 @@
 import { Button } from "@material-ui/core";
-import { AxiosError } from "axios";
+import axios, { AxiosError } from "axios";
 import { Formik } from "formik";
 import { useSnackbar } from "notistack";
 import { UseMutateAsyncFunction, useQueryClient } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { errorMessages, successMessages } from "../../shared/constants";
 import { IQuizForm } from "../../shared/interfaces";
+import { GetErrorResponse } from "../../shared/utils";
 import { AddEditQuizValidation } from "../../shared/validationSchema";
 import { AddEditQuizFormFields } from "../AddEditQuizFormFields";
 
@@ -71,8 +72,15 @@ export const QuizForm: React.FC<Props> = ({
                 id && queryClient.invalidateQueries(["Quiz", id]);
                 navigate(redirect);
               },
-              onError: () => {
-                enqueueSnackbar(errorMessages.default);
+              onError: (e) => {
+                if (axios.isAxiosError(e)) {
+                  const data = GetErrorResponse(e)
+                  enqueueSnackbar(data.message, {
+                    variant: "error",
+                  });
+                } else {
+                  enqueueSnackbar(errorMessages.default, { variant: "error" });
+                }
               },
               onSettled: () => {
                 reset();

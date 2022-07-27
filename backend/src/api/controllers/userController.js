@@ -1,6 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import User from '../../models/User.js';
 import generateToken from '../../utils/GenerateToken.js';
+import { AppError } from '../../utils/AppError.js';
 
 // @desc Register a new User
 // @route POST /users
@@ -10,8 +11,7 @@ const registerUser = asyncHandler(async (req, res) => {
 	const userExists = await User.findOne({ email });
 
 	if (userExists) {
-		res.status(400);
-		throw new Error('user already exists');
+		throw new AppError('user already exists', 400);
 	}
 
 	const user = await User.create({
@@ -28,8 +28,7 @@ const registerUser = asyncHandler(async (req, res) => {
 			token: generateToken(user._id)
 		});
 	} else {
-		res.status(400);
-		throw new Error('Invalid user data');
+		throw new AppError('Invalid user data', 400);
 	}
 });
 
@@ -47,8 +46,7 @@ const authUser = asyncHandler(async (req, res) => {
 			token: generateToken(user._id)
 		});
 	} else {
-		res.status(401);
-		throw new Error('invalid email or password');
+		throw new AppError('invalid email or password', 401);
 	}
 });
 
@@ -64,8 +62,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
 			name: user.name
 		});
 	} else {
-		res.status(404);
-		throw new Error('User not found');
+		throw new AppError('User not found', 404);
 	}
 });
 
@@ -91,8 +88,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
 			token: generateToken(updatedUser._id)
 		});
 	} else {
-		res.status(404);
-		throw new Error('User not found');
+		throw new AppError('User not found', 404);
 	}
 });
 

@@ -7,8 +7,8 @@ import { Dashboard } from './pages/Dashboard';
 import { Landing } from './pages/Landing';
 import { PlayerScreen } from './pages/PlayerScreen';
 import { Quizes } from './pages/Quizes';
-import { SignInPage } from './pages/SignIn';
-import SignUpPage from './pages/Signup';
+import { Login } from './pages/Login';
+import { Signup } from './pages/Signup';
 import { UpdateQuestion } from './pages/UpdateQuestion';
 import { UpdateQuiz } from './pages/UpdateQuiz';
 import { UserProfilePage } from './pages/UserProfile';
@@ -30,13 +30,14 @@ function App() {
           />
           <Route path='/user' element={<UserProfilePage />} />
           <Route path='/' element={<Navigate replace to='/quizes' />} />
+          <Route path='*' element={<Navigate replace to='/quizes' />} />
         </Routes>
       </SignedIn>
       <SignedOut>
         <Routes>
           <Route path='/' element={<Landing />} />
-          <Route path='/sign-up' element={<SignUpPage />} />
-          <Route path='/sign-in' element={<SignInPage />} />
+          <Route path='/sign-up' element={<Signup />} />
+          <Route path='/sign-in' element={<Login />} />
           <Route path='/quizes/:id/play' element={<PlayerScreen />} />
           <Route path='*' element={<Navigate replace to='/' />} />
         </Routes>

@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useMediaQuery } from '@material-ui/core';
 import { useSnackbar } from 'notistack';
 import { useEffect, useState } from 'react';
@@ -12,6 +13,7 @@ import {
 } from '../shared/constants';
 import { IQuestion } from '../shared/interfaces';
 import { useDeleteQuestion } from '../shared/queries';
+import { GetErrorResponse } from '../shared/utils';
 import { DeleteModal } from './DeleteModal';
 
 interface Props {
@@ -126,8 +128,15 @@ const SidebarQuestion: React.FC<SidebarProps> = ({
     mutate(
       {},
       {
-        onError: () => {
-          enqueueSnackbar(errorMessages.default, { variant: 'error' });
+        onError: (e) => {
+          if (axios.isAxiosError(e)) {
+            const data = GetErrorResponse(e)
+            enqueueSnackbar(data.message, {
+              variant: "error",
+            });
+          } else {
+            enqueueSnackbar(errorMessages.default, { variant: "error" });
+          }
         },
         onSettled: () => {
           reset();

@@ -1,3 +1,4 @@
+import axios from "axios";
 import { Formik } from "formik";
 import { useSnackbar } from "notistack";
 import { useQueryClient } from "react-query";
@@ -11,6 +12,7 @@ import { IOption, IQuestionForm } from "../../shared/interfaces";
 import { useUpdateQuestion } from "../../shared/queries";
 import { AddEditQuestionValidation } from "../../shared/validationSchema";
 import { AddEditQuestionFormFields } from "./AddEditQuestionFormFields";
+import { GetErrorResponse } from '../../shared/utils';
 
 interface Props {
   id: string;
@@ -68,8 +70,15 @@ export const UpdateQuestionForm: React.FC<Props> = ({
               queryClient.invalidateQueries(["Quiz Questions", quizId]);
               queryClient.invalidateQueries(["Quiz Question", quizId, id]);
             },
-            onError: () => {
-              enqueueSnackbar(errorMessages.default, { variant: "error" });
+            onError: (e) => {
+              if (axios.isAxiosError(e)) {
+                const data = GetErrorResponse(e)
+                enqueueSnackbar(data.message, {
+                  variant: "error",
+                });
+              } else {
+                enqueueSnackbar(errorMessages.default, { variant: "error" });
+              }
             },
             onSettled: () => {
               updateQuestionReset();

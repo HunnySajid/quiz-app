@@ -10,6 +10,7 @@ export const globalColors = {
 }
 
 type TactionSuccess =
+    | 'Logged In'
     | 'Updated'
     | 'Deleted'
     | 'Published'
@@ -20,7 +21,7 @@ type TactionLoading =
     | 'Deleting'
     | 'Creating';
 
-type TResource = 'Question' | 'Quiz'
+type TResource = 'Question' | 'Quiz' | 'User'
 
 export const successMessages = {
     actionSuccess: (action: TactionSuccess, resource?: TResource) =>

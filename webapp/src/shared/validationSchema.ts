@@ -1,15 +1,15 @@
 import * as Yup from 'yup';
 
 export const SignupUserValidation = Yup.object().shape({
-    name: Yup.string().required('Name is required.'),
+    name: Yup.string().required('Name is required.').max(50, 'Not more than 50 characters'),
     password: Yup.string().required('Password is required.')
         .min(6, 'At least 6 characters')
         .max(30, 'Not More than 30 characters'),
     email: Yup.string().email().required('Email is required'),
 });
 
-export const SigninUserValidation = Yup.object().shape({
-    email: Yup.string().email().required('Email is required'),
+export const LoginUserValidation = Yup.object().shape({
+    email: Yup.string().email('Must be a valid email').required('Email is required'),
     password: Yup.string().required('Password is required.')
 });
 

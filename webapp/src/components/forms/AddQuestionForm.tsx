@@ -12,6 +12,7 @@ import { IQuestionForm } from "../../shared/interfaces";
 import { useCreateQuestion } from "../../shared/queries";
 import { AddEditQuestionValidation } from "../../shared/validationSchema";
 import { AddEditQuestionFormFields } from "./AddEditQuestionFormFields";
+import { GetErrorResponse } from '../../shared/utils';
 
 interface Props {}
 
@@ -104,7 +105,8 @@ export const AddQuestionForm: React.FC<Props> = () => {
               },
               onError: (err) => {
                 if (axios.isAxiosError(err)) {
-                  enqueueSnackbar(err.response?.data.message, {
+                  const data = GetErrorResponse(err)
+                  enqueueSnackbar(data.message, {
                     variant: "error",
                   });
                 } else {
