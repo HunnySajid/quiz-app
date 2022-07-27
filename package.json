@@ -7,16 +7,18 @@
   "author": "Hunain Bin Sajid <Hunainbinsajid@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "start": "node src/app.js",
-    "dev": "nodemon src/app.js",
-    "start:prod": "NODE_ENV=production nodemon ./src/app.js",
+    "start": "node backend/src/app.js",
+    "server": "nodemon backend/src/app.js",
+    "client": "npm start --prefix webapp",
+    "dev": "concurrently \"npm run server\" \"npm run client\" ",
+    "start:prod": "NODE_ENV=production nodemon ./backend/src/app.js",
     "format:check": "prettier --check .",
     "format:write": "prettier --write .",
     "lint:check": "eslint .",
     "lint:fix": "eslint --fix ."
   },
   "devDependencies": {
-    "eslint": "^8.20.0",
+    "eslint": "^7.11.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
     "prettier": "^2.7.1"

@@ -19,6 +19,9 @@ const quizSchema = mongoose.Schema(
 			default: 'draft',
 			enum: ['draft', 'active', 'inactive']
 		},
+		permalink: {
+			type: String
+		},
 		deleted: {
 			type: Boolean,
 			default: false,
