@@ -22,10 +22,6 @@ const createQuiz = asyncHandler(async (req, res) => {
 		throw new AppError('Please send tags as array.', 400);
 	}
 
-	if (tags && !(tags.length >= 1)) {
-		throw new AppError('Please send at least 1 tag in array.', 400);
-	}
-
 	const quiz = await Quiz.create({
 		title,
 		description,
@@ -120,7 +116,9 @@ const publishQuiz = asyncHandler(async (req, res, next) => {
 // @route GET /quizzes
 // @access PRIVATE
 const getAllQuizzes = asyncHandler(async (req, res) => {
-	const quizzes = await Quiz.find({ author: req.user._id }).populate('questionsCount');
+	const quizzes = await Quiz.find({ author: req.user._id, deleted: false }).populate(
+		'questionsCount'
+	);
 	const count = await Quiz.countDocuments({ author: req.user._id });
 	return res.status(200).json({
 		status: 'success',
@@ -146,6 +144,10 @@ const getQuiz = asyncHandler(async (req, res) => {
 		throw new AppError('Quiz not found', 404);
 	}
 
+	if (quiz.deleted) {
+		throw new AppError('Quiz is inactivated', 403);
+	}
+
 	return res.status(200).json({
 		status: 'success',
 		quiz: quiz
@@ -167,6 +169,10 @@ const getQuizToPlay = asyncHandler(async (req, res) => {
 
 	if (!quiz) {
 		throw new AppError('Quiz not found.', 404);
+	}
+
+	if (quiz.deleted) {
+		throw new AppError('Quiz is inactivated', 404);
 	}
 
 	return res.status(200).json({

@@ -102,8 +102,12 @@ const getQuestion = asyncHandler(async (req, res) => {
 const updateQuestion = asyncHandler(async (req, res) => {
 	const { quizId, questionId } = req.params;
 	const { title, options } = req.body;
-
+	const quiz = await Quiz.findById(quizId);
 	const questiontoUpdate = await Question.findOne({ _id: questionId, quiz: quizId });
+
+	if (quiz.status === 'active') {
+		throw new AppError('Can not edit a question that is published', 403);
+	}
 
 	if (!questiontoUpdate) {
 		throw new AppError(errorMessages.RESOURCE_DOES_NOT_EXIST('Question'), 404);
@@ -143,7 +147,11 @@ const updateQuestion = asyncHandler(async (req, res) => {
 // @access PRIVATE
 const deleteQuestion = asyncHandler(async (req, res) => {
 	const { quizId, questionId } = req.params;
+	const quiz = await Quiz.findById(quizId);
 
+	if (quiz.status === 'active') {
+		throw new AppError('Can not delete a question that is published', 403);
+	}
 	const question = await Question.findOneAndDelete({ _id: questionId, quiz: quizId });
 
 	if (!question) {
