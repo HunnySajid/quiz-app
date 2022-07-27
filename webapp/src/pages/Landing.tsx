@@ -1,7 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import Active from "../assets/illustations/Active.png";
-import AddQuestions from "../assets/illustations/Add Questions.png";
-import Create from "../assets/illustations/Create.png";
 import LandingIllustration from "../assets/illustations/landing.png";
 import Logo from "../assets/logos/White-Purple-Circle.png";
 import { Footer } from "../components/Footer";
@@ -35,7 +32,7 @@ export const Landing = () => {
               <h1 className="text-2xl font-thin text-slate-800">Trivia App</h1>
             </div>
             <h2 className="text-4xl font-medium mt-2 text-slate-600">
-              Quiz Builder and Assessment Tool
+              Your one stop Quiz Builder App
             </h2>
             <p className="w-10/12 mt-4 text-slate-600 font-medium text-2xl">
               Using Trivia App, it’s super fast and easy to create a quiz - perfect
@@ -52,53 +49,7 @@ export const Landing = () => {
           </div>
         </div>
       </div>
-      <div className="my-20 max-w-screen-xl mx-5 md:mx-auto">
-        <h2 className="text-center text-2xl md:text-4xl font-medium text-slate-600">
-          Everything You Need to Build and Manage Your Quiz
-        </h2>
-        <div style={{ gap: 20 }} className="grid mt-10 grid-use-app">
-          {AppUseData.map((useData) => (
-            <div
-              className="flex flex-col px-4 py-7 items-center justify-center shadow-large rounded-md"
-              key={useData.id}
-            >
-              <div className="w-16 h-16">
-                <img
-                  src={useData.imgsrc}
-                  className="w-full h-full object-cover"
-                  alt="Create a Quiz Illustration"
-                />
-              </div>
-              <p className="ml-4 mt-3 text-md w-50 text-center">
-                {useData.label}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
       <Footer />
     </div>
   );
 };
-
-/*
-Make your own quiz and test yourself
-*/
-
-const AppUseData = [
-  {
-    id: "1",
-    imgsrc: Create,
-    label: "Create a Quiz",
-  },
-  {
-    id: "2",
-    imgsrc: AddQuestions,
-    label: "Add Questions to your Quiz",
-  },
-  {
-    id: "3",
-    imgsrc: Active,
-    label: "Set status of Quiz to Active",
-  },
-];
