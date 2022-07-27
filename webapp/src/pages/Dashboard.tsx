@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from 'axios';
 import { Button } from '@material-ui/core';
 import { useSnackbar } from 'notistack';
 import { useEffect, useState } from 'react';
@@ -80,12 +80,12 @@ export const Dashboard: React.FC<Props> = () => {
         },
         onError: (e) => {
           if (axios.isAxiosError(e)) {
-            const data = GetErrorResponse(e)
+            const data = GetErrorResponse(e);
             enqueueSnackbar(data.message, {
-              variant: "error",
+              variant: 'error',
             });
           } else {
-            enqueueSnackbar(errorMessages.default, { variant: "error" });
+            enqueueSnackbar(errorMessages.default, { variant: 'error' });
           }
         },
         onSettled: () => {
@@ -170,8 +170,32 @@ export const Dashboard: React.FC<Props> = () => {
                     </Button>
                   </div>
                 ) : null}
+                {selectedQuiz?.status === 'active' ? (
+                  <div className='mr-4'>
+                    <Button
+                      variant='text'
+                      size='small'
+                      color='primary'
+                      disabled={!selectedQuiz?.permalink}
+                      onClick={() => {
+                        if (selectedQuiz?.permalink) {
+                          navigator.clipboard.writeText(
+                            `${window.location.origin}/quizes/${selectedQuiz?.permalink}/play`
+                          );
+                        }
+                      }}
+                    >
+                      Copy
+                    </Button>
+                  </div>
+                ) : null}
                 <div className='mr-4'>
-                  <Button size='small' color='secondary' onClick={handleDeleteModalOpen} variant='outlined'>
+                  <Button
+                    size='small'
+                    color='secondary'
+                    onClick={handleDeleteModalOpen}
+                    variant='outlined'
+                  >
                     Delete
                   </Button>
                 </div>

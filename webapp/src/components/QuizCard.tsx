@@ -49,6 +49,7 @@ export const QuizCard: React.FC<Props> = (props) => {
         }`}
         style={{ boxShadow: "15px 15px 54px -10px #0000001f" }}
       >
+        <div>
         {isDashboardPage && (
           <p
             className={`${
@@ -64,6 +65,7 @@ export const QuizCard: React.FC<Props> = (props) => {
             {status}
           </p>
         )}
+        </div>
         <p className="font-semibold whitespace-nowrap overflow-hidden text-ellipsis	break-words mt-2">
           {title}
         </p>

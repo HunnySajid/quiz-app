@@ -87,7 +87,7 @@ const updateQuiz = asyncHandler(async (req, res) => {
 const publishQuiz = asyncHandler(async (req, res, next) => {
 	const { quizId } = req.params;
 
-	const quiz = await Quiz.findById(quizId);
+	const quiz = await Quiz.findById(quizId).populate('questionsCount');
 
 	if (!quiz) {
 		throw new AppError('Quiz does not exist', 404);
@@ -100,6 +100,11 @@ const publishQuiz = asyncHandler(async (req, res, next) => {
 	if (quiz.deleted) {
 		throw new AppError('Quiz is inactivated', 403);
 	}
+
+	if (quiz.questionsCount < 1) {
+		throw new AppError('Quiz does not have any questions associated', 403);
+	}
+
 	quiz.status = 'active';
 	// TODO: need an advance way to assign permalink, need to check if it is not already associated with some published quiz
 	quiz.permalink = Math.random().toString(36).substr(2, 6);
